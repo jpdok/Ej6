@@ -35,15 +35,65 @@ public class PrincipalEj6 {
 				switch(opcion)
 				{
 				case 1: productData.recuperarTodos();
+						break;
+				case 2: 
+				{
+					System.out.print("Ingrese el id del producto a recuperar: ");
+					int id = Integer.parseInt(lector.nextLine());
+					
+					Product pro = new Product();
+					pro.setId(id);
+					Product p = new Product();
+					p=productData.recuperarProducto(pro);
+					if(p.getName()!=null) 
+					{
+					System.out.println("Producto recuperado por ID: "+pro.getId());
+				    System.out.println(p.toString());
+				    System.out.println();System.out.println();
+					}
+					else
+					{
+					System.out.println("No se ha encontrado el producto con ID: "+pro.getId());
+					}
 					break;
-				case 2: break;
-				case 3: break;
-				case 4: break;
-				case 5: break;
+				}
+				case 3:
+				{	
+					System.out.println("Ingrese la informacion del nuevo producto: ");
+					System.out.print("Name: ");
+					String name = lector.nextLine();
+					System.out.print("Description: ");
+					String description = lector.nextLine();
+					System.out.print("Price: ");
+					double price = Double.parseDouble(lector.nextLine());
+					System.out.print("Stock: ");
+					int stock = Integer.parseInt(lector.nextLine());
+					System.out.print("includedShipping (True/False): ");
+					boolean shippingIncluded = Boolean.parseBoolean(lector.nextLine());
+					productData.insertarNuevo(name, description, price, stock, shippingIncluded);
+					break;
+				}
+				case 4: 
+					{
+						Product prod = new Product();
+						System.out.print("Ingrese la id del producto a eliminar: ");
+						prod.setId(Integer.parseInt(lector.nextLine()));
+						productData.borrarProducto(prod);
+						break;
+					}
+				case 5: 
+					Product prod = new Product();
+					System.out.print("Ingrese la id del producto a modificar: ");
+					prod.setId(Integer.parseInt(lector.nextLine()));
+					productData.cargaDatos(prod);
+					productData.actualizaProducto(prod);
+					break;
 				case 6: salir = true;
+				lector.close();
 						break;
 				default: System.out.println("Las opciones son entre 1 y 6");
 				}
+				
 				
 			}
 		}catch(InputMismatchException e) {
@@ -51,31 +101,10 @@ public class PrincipalEj6 {
 			lector.next();
 		}
 		
+	
 		
-		//1)List
-		//productData.recuperarTodos();
-		
-		//2)Search
-		/*System.out.print("Ingrese el id del producto a recuperar: ");
-		//Scanner lector = new Scanner(System.in);
-		int id = Integer.parseInt(lector.nextLine());
-		lector.close();
-		Product pro = new Product();
-		pro.setId(id);
-		Product p = new Product();
-		p=productData.recuperarProducto(pro);
-		if(p.getName()!=null) 
-			{
-			System.out.println("Producto recuperado por ID: "+pro.getId());
-		    System.out.println(p.toString());
-		    System.out.println();System.out.println();
-			}
-		else
-			{
-			System.out.println("No se ha encontrado el producto con ID: "+pro.getId());
-			}
-		
-		*///3)New
+
+		//3)New
 		/*System.out.println("Ingrese la informacion del nuevo producto: ");
 		System.out.print("Name: ");
 		String name = lector.nextLine();
@@ -88,7 +117,7 @@ public class PrincipalEj6 {
 		System.out.print("includedShipping (True/False): ");
 		boolean shippingIncluded = Boolean.parseBoolean(lector.nextLine());
 		productData.insertarNuevo(name, description, price, stock, shippingIncluded);
-		lector.close();*/
+		 */
 	}
 
 }

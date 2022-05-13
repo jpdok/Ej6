@@ -7,9 +7,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
+import data.dbConnection;
 
-import entities.Documento;
-import entities.Persona;
+import java.util.*;
+
+
 import entities.Product;
 
 public class productData {
@@ -21,8 +23,8 @@ public class productData {
 		LinkedList<Product> productos = new LinkedList<>();
 		try {
 			// crear una conexión
-			conn =
-		       DriverManager.getConnection("jdbc:mysql://localhost/javamarket","root","admin");
+			conn = dbConnection.openConn();
+		       //DriverManager.getConnection("jdbc:mysql://localhost/javamarket","root","admin");
 			 //DriverManager.getConnection("jdbc:mysql://localhost/javaTest?user=java&password=himitsu");
 
 			// ejecutar la query
@@ -46,7 +48,7 @@ public class productData {
             if(rs!=null){rs.close();}
             if(stmt!=null){stmt.close();}
 
-		    conn.close();
+		    dbConnection.closeConn(conn);
 		    
 		    // mostrar info
 		    System.out.println("Listado Completo");
@@ -63,23 +65,20 @@ public class productData {
 	
 	public static Product recuperarProducto(Product prod) {
 		Product p = prod;
-		
+		PreparedStatement stmt=null;
+		Connection conn=null;
 		try {
-			// crear una conexión
-			conn =
-		       DriverManager.getConnection("jdbc:mysql://localhost/javamarket","root","admin");
+			conn = dbConnection.openConn();
 
-			// definir la query
-            PreparedStatement stmt = conn.prepareStatement("select * from product where idProduct=?");
+
+            stmt = conn.prepareStatement("select * from product where idProduct=?");
             
-            // setear el/los parámetros
             stmt.setInt(1, p.getId());
 
           
-            // ejecutar query y obtener resultados
             ResultSet rs= stmt.executeQuery();
 
-            // mapear de resultset a objeto
+
             if(rs.next()) {
                 p.setId(rs.getInt("idProduct"));
                 p.setStock(rs.getInt("stock"));
@@ -88,7 +87,7 @@ public class productData {
                 p.setPrice(rs.getDouble("price"));
                 p.setShippingIncluded(rs.getBoolean("shippingIncluded"));
             }
-            //cerrar recursos
+
             if(rs!=null){rs.close();}
             if(stmt!=null){stmt.close();}
 
@@ -154,6 +153,80 @@ public class productData {
 		    System.out.println("SQLState: " + ex.getSQLState());
 		    System.out.println("VendorError: " + ex.getErrorCode());
 		}
+	}
+
+	public static void borrarProducto(Product prod) {
+		Product p = prod;
+		PreparedStatement stmt=null;
+		Connection conn=null;
+		try {
+			conn = dbConnection.openConn();
+
+			stmt = conn.prepareStatement("delete from product where idProduct=?");
+            
+            stmt.setInt(1, p.getId());
+
+            stmt.executeUpdate();
+            
+            if(stmt!=null) {stmt.close();}
+
+			dbConnection.closeConn(conn);
+
+		} 
+		catch (SQLException ex) {
+		    // Manejo de errores
+		    ex.printStackTrace();
+		} 
+
+		}
+	
+	public static void actualizaProducto(Product prod) {
+		PreparedStatement stmt =null;
+		Connection conn = null;
+		
+		try {
+			conn=dbConnection.openConn();
+			stmt = conn.prepareStatement(
+					"update product "+
+					"set name = ?, description = ?, price = ?, stock = ?, shippingIncluded = ? "+
+					"where idProduct = ?");
+			stmt.setString(1, prod.getName());
+			stmt.setString(2, prod.getDescription());
+			stmt.setDouble(3, prod.getPrice());
+			stmt.setInt(4, prod.getStock());
+			stmt.setBoolean(5, prod.getShippingIncluded());
+			stmt.setInt(6, prod.getId());
+			
+			stmt.executeUpdate();
+			
+			if(stmt!=null)stmt.close();
+			dbConnection.closeConn(conn);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} 
+	}
+	
+	public static void cargaDatos(Product prod)
+	{	
+		Scanner lector = new Scanner(System.in);
+		System.out.println("Ingrese los datos del producto: ");
+		System.out.print("Name: ");
+		String name = lector.nextLine();
+		prod.setName(name);
+		System.out.print("Description: ");
+		String description = lector.nextLine();
+		prod.setDescription(description);
+		System.out.print("Price: ");
+		double price = Double.parseDouble(lector.nextLine());
+		prod.setPrice(price);
+		System.out.print("Stock: ");
+		int stock = Integer.parseInt(lector.nextLine());
+		prod.setStock(stock);
+		System.out.print("includedShipping (True/False): ");
+		boolean shippingIncluded = Boolean.parseBoolean(lector.nextLine());
+		prod.setShippingIncluded(shippingIncluded);
+		lector.close();
 	}
 }
 
